@@ -27,13 +27,9 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 	public $defaults = array(
 		'scanAppDir' => TRUE,
 		'scanComposerMap' => TRUE,
-	);
-
-	/**
-	 * @var array
-	 */
-	public $whitelist = array(
-		'^(?!KdybyModule\\\\)(.+Module)?.+Presenter\\z',
+		'whitelist' => array(
+			'^(?!KdybyModule\\\\)(.+Module)?.+Presenter\\z',
+		)
 	);
 
 
@@ -56,11 +52,12 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 			return; // production only
 		}
 
+		$config = $this->getConfig($this->defaults);
 		$presentersSetup = $this->getPresentersConfig();
 
 		$counter = 0;
 		foreach ($this->getIndexedClasses() as $class) {
-			if (!$class = $this->resolveRealClassName($class)) {
+			if (!$class = $this->resolveRealClassName($class, $config)) {
 				continue;
 			}
 
@@ -101,14 +98,21 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 
 	/**
 	 * @param string $class
-	 * @return string|NULL
+	 * @param array $config
+	 * @return NULL|string
 	 */
-	protected function resolveRealClassName($class)
+	protected function resolveRealClassName($class, array $config)
 	{
-		foreach ($this->whitelist as $mask) {
-			if (!preg_match('~' . $mask . '~iu', $class)) {
-				return NULL;
+		$allowed = FALSE;
+		foreach ($config['whitelist'] as $mask) {
+			if (preg_match('~' . $mask . '~iu', $class)) {
+				$allowed = TRUE;
+				break;
 			}
+		}
+
+		if (!$allowed) {
+			return NULL; // no whitelist allowed the class to be registered
 		}
 
 		if (!class_exists($class)) {
