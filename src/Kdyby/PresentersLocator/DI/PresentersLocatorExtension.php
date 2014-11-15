@@ -126,7 +126,7 @@ class PresentersLocatorExtension extends Nette\DI\CompilerExtension
 			return NULL;
 		}
 
-		if (!$refl->isInstantiable() || !$refl->implementsInterface(Nette\Application\IPresenter::class)) {
+		if (!$refl->isInstantiable() || !$refl->implementsInterface('Nette\Application\IPresenter')) {
 			return NULL; // class is not a presenter
 		}
 
