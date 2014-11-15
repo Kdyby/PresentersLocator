@@ -18,7 +18,7 @@ use Nette;
 /**
  * @author Filip Procházka <filip@prochazka.su>
  */
-class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
+class PresentersLocatorExtension extends Nette\DI\CompilerExtension
 {
 
 	/**
