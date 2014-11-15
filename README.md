@@ -1,6 +1,7 @@
 Kdyby/PresentersLocator
 ======
 
+Auto-register presenters in Nette Framework
 
 
 Requirements
