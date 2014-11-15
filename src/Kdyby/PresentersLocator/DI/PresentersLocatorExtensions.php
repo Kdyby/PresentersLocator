@@ -34,8 +34,9 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 	public function loadConfiguration()
 	{
 		$builder = $this->getContainerBuilder();
-		$builder->getDefinition('nette.presenterFactory')
-			->setClass('Kdyby\PresentersLocator\PresenterFactory');
+
+		$presenterFactory = $builder->getDefinition('nette.presenterFactory');
+		$presenterFactory->setFactory('Kdyby\PresentersLocator\PresenterFactory', $presenterFactory->getFactory()->arguments);
 	}
 
 
