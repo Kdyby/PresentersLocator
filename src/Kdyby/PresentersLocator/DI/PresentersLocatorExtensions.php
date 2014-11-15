@@ -26,6 +26,7 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 	 */
 	public $defaults = array(
 		'scanAppDir' => TRUE,
+		'scanComposerMap' => TRUE,
 	);
 
 
@@ -124,7 +125,7 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 			$indexed = array_merge($indexed, array_keys($robot->getIndexedClasses()));
 		}
 
-		if (file_exists($composerClassmapFile = $builder->expand('%appDir%/../vendor/composer/autoload_classmap.php'))) {
+		if ($config['scanComposerMap'] && file_exists($composerClassmapFile = $builder->expand('%appDir%/../vendor/composer/autoload_classmap.php'))) {
 			$indexed = array_merge($indexed, array_keys(self::loadFile($composerClassmapFile)));
 		}
 
