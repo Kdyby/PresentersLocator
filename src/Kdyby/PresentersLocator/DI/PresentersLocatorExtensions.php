@@ -76,6 +76,25 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 				$def->addSetup($setup);
 			}
 		}
+
+		if (!class_exists('Nette\DI\Extensions\InjectExtension')) {
+			return; // the inject extension is not yet separated from Compiler in this version of Nette
+		}
+
+		$injectsExtension = FALSE;
+		foreach ($this->compiler->getExtensions() as $extension) {
+			if ($extension instanceof Nette\DI\Extensions\InjectExtension) {
+				$injectsExtension = $extension;
+				continue;
+			}
+
+			if ($injectsExtension && $extension instanceof self) {
+				// the InjectExtension is sadly registered before this one, and this one needs injects
+				// because the InjectExtension::updateDefinition() is private and cannot be used explicitly
+				$injectsExtension->beforeCompile();
+				break;
+			}
+		}
 	}
 
 
