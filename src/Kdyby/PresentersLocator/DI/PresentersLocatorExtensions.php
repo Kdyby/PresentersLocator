@@ -29,6 +29,13 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 		'scanComposerMap' => TRUE,
 	);
 
+	/**
+	 * @var array
+	 */
+	public $whitelist = array(
+		'^(?!KdybyModule\\\\)(.+Module)?.+Presenter\\z',
+	);
+
 
 
 	public function loadConfiguration()
@@ -52,34 +59,59 @@ class PresentersLocatorExtensions extends Nette\DI\CompilerExtension
 		$presentersSetup = $this->getPresentersConfig();
 
 		$counter = 0;
-		foreach ($this->getIndexedClasses() as $class => $file) {
-			try {
-				$refl = Nette\Reflection\ClassType::from($class);
-
-				if (!$refl->isInstantiable() || !$refl->implementsInterface(Nette\Application\IPresenter::class)) {
-					continue; // class is not a presenter
-				}
-
-				if ($builder->findByType($class, FALSE)) {
-					continue; // presenter is already registered
-				}
-
-				$def = $builder->addDefinition($this->prefix('presenter.' . (++$counter)))
-					->setClass($class)
-					->setInject(TRUE);
-
-				if (!isset($presentersSetup[$lName = strtolower($refl->getName())])) {
-					continue;
-				}
-
-				foreach ($presentersSetup[$lName] as $setup) {
-					$def->addSetup($setup);
-				}
-
-			} catch (\ReflectionException $e) {
+		foreach ($this->getIndexedClasses() as $class) {
+			if (!$class = $this->resolveRealClassName($class)) {
 				continue;
 			}
+
+			$def = $builder->addDefinition($this->prefix('presenter.' . (++$counter)))
+				->setClass($class)
+				->setInject(TRUE);
+
+			if (!isset($presentersSetup[$lName = strtolower($class)])) {
+				continue;
+			}
+
+			foreach ($presentersSetup[$lName] as $setup) {
+				$def->addSetup($setup);
+			}
 		}
+	}
+
+
+
+	/**
+	 * @param string $class
+	 * @return string|NULL
+	 */
+	protected function resolveRealClassName($class)
+	{
+		foreach ($this->whitelist as $mask) {
+			if (!preg_match('~' . $mask . '~iu', $class)) {
+				return NULL;
+			}
+		}
+
+		if (!class_exists($class)) {
+			return NULL; // prevent meaningless exceptions
+		}
+
+		try {
+			$refl = Nette\Reflection\ClassType::from($class);
+
+		} catch (\ReflectionException $e) {
+			return NULL;
+		}
+
+		if (!$refl->isInstantiable() || !$refl->implementsInterface(Nette\Application\IPresenter::class)) {
+			return NULL; // class is not a presenter
+		}
+
+		if ($this->getContainerBuilder()->findByType($class, FALSE)) {
+			return NULL; // presenter is already registered
+		}
+
+		return $refl->getName();
 	}
 
 
