@@ -1,31 +1,11 @@
-Kdyby/PresentersLocator
-======
-
-Auto-register presenters in Nette Framework
+# Kdyby/PresentersLocator
 
 
-Requirements
-------------
+## DEPRECATED
 
-Kdyby/PresentersLocator requires PHP 5.3.2.
+This package is no longer beeing developed, because this functionality is natively in Nette Framework from 2.3.
+It won't be removed, so you don't have to hurry migrating, but also no new features will be added.
 
-- [Nette Framework](https://github.com/nette/nette)
-
-
-Installation
-------------
-
-The best way to install Kdyby/PresentersLocator is using  [Composer](http://getcomposer.org/):
-
-```sh
-$ composer require kdyby/presenters-locator:@dev
-```
-
-
-Documentation
-------------
-
-Learn more in the [documentation](https://github.com/Kdyby/PresentersLocator/blob/master/docs/en/index.md).
 
 
 -----
